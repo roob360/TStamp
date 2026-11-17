@@ -31,67 +31,177 @@
   <div id="body">
 
     <aside id="panel">
-      <section class="group">
-        <h2>Tanggal dan jam</h2>
-        <label class="field">Tanggal default
-          <input type="date" id="setDate">
-        </label>
-        <button class="btn" id="btnApplyDate">Terapkan tanggal ke semua</button>
 
-        <div class="seg" role="radiogroup" aria-label="Mode jam">
-          <label><input type="radio" name="mode" value="random"><span>Jam acak</span></label>
-          <label><input type="radio" name="mode" value="manual"><span>Jam manual</span></label>
-        </div>
-        <div class="row2">
-          <label class="field">Acak dari
-            <input type="time" step="1" id="setStart">
+      <details class="group" open>
+        <summary>Tanggal dan jam</summary>
+        <div class="group-body">
+          <label class="field">Tanggal (mulai)
+            <input type="date" id="setDate">
           </label>
-          <label class="field">Sampai
-            <input type="time" step="1" id="setEnd">
+          <button class="btn" id="btnApplyDate">Terapkan tanggal</button>
+          <div class="row2 numrow">
+            <label class="field">Ganti hari tiap
+              <input type="number" id="setAutoEvery" min="1" max="999" step="1">
+            </label>
+            <span class="unit">foto</span>
+          </div>
+          <button class="btn" id="btnAutoDate">Tanggal otomatis</button>
+
+          <div class="seg" role="radiogroup" aria-label="Mode jam">
+            <label><input type="radio" name="mode" value="random"><span>Jam acak</span></label>
+            <label><input type="radio" name="mode" value="manual"><span>Jam manual</span></label>
+          </div>
+          <div class="row2">
+            <label class="field">Acak dari
+              <input type="time" step="1" id="setStart">
+            </label>
+            <label class="field">Sampai
+              <input type="time" step="1" id="setEnd">
+            </label>
+          </div>
+          <label class="check"><input type="checkbox" id="chkAscending"><span>Berurutan naik (per tanggal)</span></label>
+          <button class="btn" id="btnRandomAll">Acak jam</button>
+          <label class="field">Jam manual
+            <input type="time" step="1" id="setManualTime">
+          </label>
+          <button class="btn" id="btnApplyManual">Terapkan jam</button>
+        </div>
+      </details>
+
+      <details class="group" open>
+        <summary>Keterangan</summary>
+        <div class="group-body">
+          <label class="field">Lokasi
+            <input type="text" id="setLokasi">
+          </label>
+          <label class="field">Hashtag
+            <input type="text" id="setHashtag">
+          </label>
+          <label class="field">Teks tambahan
+            <input type="text" id="setExtra" placeholder="Opsional">
+          </label>
+          <div class="field">Baris yang ditampilkan</div>
+          <div class="checks">
+            <label class="check"><input type="checkbox" id="chkShowDate"><span>Tanggal</span></label>
+            <label class="check"><input type="checkbox" id="chkShowTime"><span>Jam</span></label>
+            <label class="check"><input type="checkbox" id="chkShowLokasi"><span>Lokasi</span></label>
+            <label class="check"><input type="checkbox" id="chkShowHashtag"><span>Hashtag</span></label>
+            <label class="check"><input type="checkbox" id="chkShowExtra"><span>Tambahan</span></label>
+          </div>
+        </div>
+      </details>
+
+      <details class="group">
+        <summary>Format tanggal dan jam</summary>
+        <div class="group-body">
+          <label class="field">Format tanggal
+            <select id="setDateFormat">
+              <option value="short">16 Sep 2026</option>
+              <option value="slash">16/09/2026</option>
+              <option value="long">Rabu, 16 September 2026</option>
+            </select>
+          </label>
+          <div class="field">Pemisah jam</div>
+          <div class="seg" role="radiogroup" aria-label="Pemisah jam">
+            <label><input type="radio" name="timeSep" value="."><span>16.22.41</span></label>
+            <label><input type="radio" name="timeSep" value=":"><span>16:22:41</span></label>
+          </div>
+          <div class="field">Sistem jam</div>
+          <div class="seg" role="radiogroup" aria-label="Sistem jam">
+            <label><input type="radio" name="hour" value="24"><span>24 jam</span></label>
+            <label><input type="radio" name="hour" value="12"><span>12 jam</span></label>
+          </div>
+          <label class="check"><input type="checkbox" id="chkSeconds"><span>Tampilkan detik</span></label>
+        </div>
+      </details>
+
+      <details class="group">
+        <summary>Tampilan teks</summary>
+        <div class="group-body">
+          <div class="field">Posisi</div>
+          <div class="pos" id="posText" role="radiogroup" aria-label="Posisi teks"></div>
+          <label class="field">Font
+            <select id="setFont">
+              <option value="auto">Otomatis (Roboto)</option>
+              <option value="Segoe UI">Segoe UI</option>
+              <option value="Arial">Arial</option>
+              <option value="Calibri">Calibri</option>
+              <option value="Tahoma">Tahoma</option>
+              <option value="Verdana">Verdana</option>
+              <option value="Consolas">Consolas</option>
+              <option value="Times New Roman">Times New Roman</option>
+            </select>
+          </label>
+          <div class="field">Ketebalan</div>
+          <div class="seg" role="radiogroup" aria-label="Ketebalan">
+            <label><input type="radio" name="bold" value="n"><span>Regular</span></label>
+            <label><input type="radio" name="bold" value="b"><span>Bold</span></label>
+          </div>
+          <label class="field slider">
+            <span class="slider-head">Ukuran <span id="valText"></span></span>
+            <input type="range" id="setTextScale" min="50" max="250" step="5">
+          </label>
+          <label class="field slider">
+            <span class="slider-head">Margin <span id="valMargin"></span></span>
+            <input type="range" id="setMargin" min="0" max="300" step="5">
+          </label>
+          <div class="colorrow">
+            <label class="field">Warna
+              <input type="color" id="setColor">
+            </label>
+            <label class="field slider grow">
+              <span class="slider-head">Transparansi <span id="valOpacity"></span></span>
+              <input type="range" id="setOpacity" min="10" max="100" step="5">
+            </label>
+          </div>
+          <label class="field slider">
+            <span class="slider-head">Bayangan <span id="valShadow"></span></span>
+            <input type="range" id="setShadow" min="0" max="100" step="5">
+          </label>
+          <label class="check"><input type="checkbox" id="chkBox"><span>Kotak latar</span></label>
+          <div class="colorrow">
+            <label class="field">Warna
+              <input type="color" id="setBoxColor">
+            </label>
+            <label class="field slider grow">
+              <span class="slider-head">Transparansi <span id="valBoxOpacity"></span></span>
+              <input type="range" id="setBoxOpacity" min="10" max="100" step="5">
+            </label>
+          </div>
+        </div>
+      </details>
+
+      <details class="group" open>
+        <summary>Logo</summary>
+        <div class="group-body">
+          <input type="file" id="logoFile" accept="image/*" class="file">
+          <button class="btn btn-destructive" id="btnClearLogo">Hapus logo</button>
+          <div class="field">Posisi</div>
+          <div class="pos" id="posLogo" role="radiogroup" aria-label="Posisi logo"></div>
+          <label class="field slider">
+            <span class="slider-head">Ukuran <span id="valLogo"></span></span>
+            <input type="range" id="setLogoScale" min="30" max="250" step="5">
+          </label>
+          <label class="field slider">
+            <span class="slider-head">Transparansi <span id="valLogoOpacity"></span></span>
+            <input type="range" id="setLogoOpacity" min="10" max="100" step="5">
           </label>
         </div>
-        <button class="btn" id="btnRandomAll">Acak jam semua foto</button>
-        <label class="field">Jam manual
-          <input type="time" step="1" id="setManualTime">
-        </label>
-        <button class="btn" id="btnApplyManual">Terapkan jam ke semua</button>
-      </section>
+      </details>
 
-      <section class="group">
-        <h2>Keterangan</h2>
-        <label class="field">Lokasi
-          <input type="text" id="setLokasi">
-        </label>
-        <label class="field">Hashtag
-          <input type="text" id="setHashtag">
-        </label>
-        <label class="field slider">
-          <span class="slider-head">Ukuran teks <span id="valText"></span></span>
-          <input type="range" id="setTextScale" min="50" max="200" step="5">
-        </label>
-      </section>
-
-      <section class="group">
-        <h2>Logo (kanan atas)</h2>
-        <input type="file" id="logoFile" accept="image/*" class="file">
-        <button class="btn btn-destructive" id="btnClearLogo">Hapus logo</button>
-        <label class="field slider">
-          <span class="slider-head">Ukuran logo <span id="valLogo"></span></span>
-          <input type="range" id="setLogoScale" min="50" max="200" step="5">
-        </label>
-      </section>
-
-      <section class="group">
-        <h2>Output</h2>
-        <div class="seg" role="radiogroup" aria-label="Format">
-          <label><input type="radio" name="format" value="jpg"><span>JPG</span></label>
-          <label><input type="radio" name="format" value="png"><span>PNG</span></label>
+      <details class="group" open>
+        <summary>Output</summary>
+        <div class="group-body">
+          <div class="seg" role="radiogroup" aria-label="Format">
+            <label><input type="radio" name="format" value="jpg"><span>JPG</span></label>
+            <label><input type="radio" name="format" value="png"><span>PNG</span></label>
+          </div>
+          <label class="field slider">
+            <span class="slider-head">Kualitas JPG <span id="valQuality"></span></span>
+            <input type="range" id="setQuality" min="60" max="100" step="1">
+          </label>
         </div>
-        <label class="field slider">
-          <span class="slider-head">Kualitas JPG <span id="valQuality"></span></span>
-          <input type="range" id="setQuality" min="60" max="100" step="1">
-        </label>
-      </section>
+      </details>
     </aside>
 
     <main id="center">
@@ -103,8 +213,16 @@
     </main>
 
     <aside id="list">
-      <h2>Daftar foto <span id="count">(0)</span></h2>
+      <div class="list-title">
+        <h2>Daftar foto <span id="count">(0)</span></h2>
+      </div>
+      <div class="list-bar">
+        <label class="check"><input type="checkbox" id="chkAll"><span>Pilih semua</span></label>
+        <span id="selInfo"></span>
+        <button class="btn sm btn-destructive" id="btnDeleteChecked" disabled>Hapus dicentang</button>
+      </div>
       <div id="rows"></div>
+      <div id="listEmpty">Belum ada foto.</div>
     </aside>
 
   </div>

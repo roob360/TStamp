@@ -1,23 +1,30 @@
 (function () {
-  const { pad, formatStamp, randomTime, drawStamp } = TSCore;
+  const T = TSCore;
   const $ = (id) => document.getElementById(id);
-  const KEY = 'tstamp.settings.v1';
+  const KEYS = ['tstamp.settings.v1', 'tstamp.settings.v2'];
+  const KEY = KEYS[1];
 
-  // ---------- Pengaturan (disimpan di app) ----------
+  // ---------- Pengaturan umum (disimpan di app) ----------
   const defaults = {
-    mode: 'random', rangeStart: '09:00:00', rangeEnd: '17:00:00',
-    lokasi: 'Kecamatan Sepaku', hashtag: '#MAPK',
-    logoData: null, logoScale: 1, textScale: 1, format: 'jpg', quality: 92,
+    mode: 'random', rangeStart: '09:00:00', rangeEnd: '17:00:00', ascending: false, autoEvery: 5,
+    lokasi: 'Kecamatan Sepaku', hashtag: '#MAPK', extra: '',
+    showDate: true, showTime: true, showLokasi: true, showHashtag: true, showExtra: true,
+    dateFormat: 'short', timeSep: '.', hour12: false, seconds: true,
+    textPos: 'bc', font: 'auto', bold: false, textScale: 1, margin: 1,
+    color: '#ffffff', opacity: 100, shadow: 50,
+    box: false, boxColor: '#000000', boxOpacity: 40,
+    logoData: null, logoPos: 'tr', logoScale: 1, logoOpacity: 100,
+    format: 'jpg', quality: 92,
   };
   const S = Object.assign({}, defaults);
-  try { Object.assign(S, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
+  KEYS.forEach((k) => { try { Object.assign(S, JSON.parse(localStorage.getItem(k) || '{}')); } catch (e) {} });
   const saveSettings = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 
   function todayStr() {
     const d = new Date();
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    return `${d.getFullYear()}-${T.pad(d.getMonth() + 1)}-${T.pad(d.getDate())}`;
   }
-  // Tidak disimpan: tanggal default dan jam manual
+  // Tidak disimpan: tanggal mulai dan jam manual
   let defDate = todayStr();
   let manualTime = '08:00:00';
 
@@ -29,21 +36,48 @@
   let logoImg = null;
   const rowEls = new Map();
 
+  const POS = ['tl', 'tc', 'tr', 'ml', 'mc', 'mr', 'bl', 'bc', 'br'];
+  const POS_NAME = {
+    tl: 'Atas kiri', tc: 'Atas tengah', tr: 'Atas kanan',
+    ml: 'Tengah kiri', mc: 'Tengah', mr: 'Tengah kanan',
+    bl: 'Bawah kiri', bc: 'Bawah tengah', br: 'Bawah kanan',
+  };
+
   const cur = () => items.find((i) => i.id === selectedId) || null;
   const setStatus = (t) => { $('status').textContent = t || ''; };
+  const randTime = () => T.randomTime(S.rangeStart || '09:00:00', S.rangeEnd || '17:00:00');
+  const newTime = () => (S.mode === 'random' ? randTime() : manualTime);
 
-  function randTime() {
-    return randomTime(S.rangeStart || '09:00:00', S.rangeEnd || '17:00:00');
-  }
-  function newTime() { return S.mode === 'random' ? randTime() : manualTime; }
-
-  // ---------- Render overlay ----------
-  function optsFor(it) {
+  // ---------- Opsi stempel per foto ----------
+  function stampOpts(it) {
+    const o = it.o;
+    const pick = (own, gen) => (own != null && own !== '' ? own : gen);
+    const dt = S.showDate || S.showTime
+      ? T.formatDateTime(it.date, it.time, {
+        showDate: S.showDate, showTime: S.showTime, dateFormat: S.dateFormat,
+        timeSep: S.timeSep, hour12: S.hour12, seconds: S.seconds,
+      })
+      : '';
+    const lines = o.hideText ? [] : [
+      dt,
+      S.showLokasi ? pick(o.lokasi, S.lokasi) : '',
+      S.showHashtag ? pick(o.hashtag, S.hashtag) : '',
+      S.showExtra ? S.extra : '',
+    ];
     return {
-      lines: [formatStamp(it.date, it.time), S.lokasi, S.hashtag],
-      logo: logoImg,
-      logoScale: S.logoScale,
-      textScale: S.textScale,
+      lines,
+      textPos: o.textPos || S.textPos,
+      textScale: o.textScale ? o.textScale / 100 : S.textScale,
+      margin: S.margin,
+      font: S.font,
+      bold: S.bold,
+      color: S.color,
+      opacity: S.opacity / 100,
+      shadow: S.shadow / 100,
+      box: { on: S.box, color: S.boxColor, opacity: S.boxOpacity / 100 },
+      logo: logoImg && !o.hideLogo
+        ? { img: logoImg, pos: S.logoPos, scale: S.logoScale, opacity: S.logoOpacity / 100 }
+        : null,
     };
   }
 
@@ -53,7 +87,7 @@
     if (!it) { cv.hidden = true; $('empty').hidden = false; return; }
     $('empty').hidden = true;
     cv.hidden = false;
-    drawStamp(cv, it.img, optsFor(it));
+    T.drawStamp(cv, it.img, stampOpts(it));
   }
   let rafPending = false;
   function redraw() {
@@ -64,12 +98,16 @@
 
   async function renderBlob(it, type) {
     const c = document.createElement('canvas');
-    drawStamp(c, it.img, optsFor(it));
+    T.drawStamp(c, it.img, stampOpts(it));
     return new Promise((res) => c.toBlob(res, type, S.quality / 100));
   }
   const outExt = () => (S.format === 'png' ? 'png' : 'jpg');
   const outType = () => (S.format === 'png' ? 'image/png' : 'image/jpeg');
-  const outName = (it) => it.name.replace(/\.[^.]+$/, '') + '_ts.' + outExt();
+  function autoBase(it) { return it.name.replace(/\.[^.]+$/, '') + '_ts'; }
+  function outName(it) {
+    const typed = (it.o.outName || '').replace(/[\\/:*?"<>|]/g, '').replace(/\.(jpe?g|png)$/i, '').trim();
+    return (typed || autoBase(it)) + '.' + outExt();
+  }
 
   // ---------- Daftar foto ----------
   function select(id) {
@@ -78,36 +116,187 @@
     redraw();
   }
 
+  function renumber() {
+    items.forEach((it, i) => {
+      const row = rowEls.get(it.id);
+      if (row) row.querySelector('.name').textContent = `${i + 1}. ${it.name}`;
+    });
+  }
+
+  function updateScope() {
+    const n = items.filter((i) => i.checked).length;
+    const t = n ? `${n} dicentang` : 'semua foto';
+    $('btnApplyDate').textContent = `Terapkan tanggal: ${t}`;
+    $('btnAutoDate').textContent = `Tanggal otomatis: ${t}`;
+    $('btnRandomAll').textContent = `Acak jam: ${t}`;
+    $('btnApplyManual').textContent = `Terapkan jam: ${t}`;
+    $('selInfo').textContent = n ? `${n} dipilih` : '';
+    $('btnDeleteChecked').disabled = !n;
+    const all = $('chkAll');
+    all.checked = n > 0 && n === items.length;
+    all.indeterminate = n > 0 && n < items.length;
+    $('count').textContent = `(${items.length})`;
+    $('listEmpty').hidden = items.length > 0;
+  }
+  const scope = () => { const c = items.filter((i) => i.checked); return c.length ? c : items; };
+
+  function refreshPlaceholders() {
+    rowEls.forEach((row, id) => {
+      const it = items.find((i) => i.id === id);
+      row.querySelector('.o-lokasi').placeholder = S.lokasi || 'Ikuti umum';
+      row.querySelector('.o-hashtag').placeholder = S.hashtag || 'Ikuti umum';
+      row.querySelector('.o-out').placeholder = it ? autoBase(it) : '';
+    });
+  }
+
+  const GRIP = '<svg width="10" height="14" viewBox="0 0 10 14" aria-hidden="true"><g fill="currentColor"><circle cx="2" cy="2" r="1.3"/><circle cx="8" cy="2" r="1.3"/><circle cx="2" cy="7" r="1.3"/><circle cx="8" cy="7" r="1.3"/><circle cx="2" cy="12" r="1.3"/><circle cx="8" cy="12" r="1.3"/></g></svg>';
+
+  let dragId = null;
+
   function buildRow(it) {
     const row = document.createElement('div');
     row.className = 'row';
+    row.dataset.id = it.id;
     row.innerHTML =
-      '<img alt=""><div class="meta"><div class="name"></div>' +
-      '<div class="inputs"><input type="date" class="d"><input type="time" step="1" class="t"></div>' +
-      '<div class="btns"><button class="btn sm rnd">Acak jam</button><button class="btn sm btn-destructive del">Hapus</button></div></div>';
-    row.querySelector('img').src = it.url;
-    row.querySelector('.name').textContent = it.name;
-    row.querySelector('.name').title = it.name;
-    const d = row.querySelector('.d');
-    const t = row.querySelector('.t');
+      '<div class="row-main">' +
+        '<span class="grip" title="Geser untuk mengubah urutan">' + GRIP + '</span>' +
+        '<input type="checkbox" class="chk" aria-label="Pilih foto">' +
+        '<img alt="">' +
+        '<div class="meta"><div class="name"></div>' +
+          '<div class="inputs"><input type="date" class="d"><input type="time" step="1" class="t"></div></div>' +
+        '<button class="chev" aria-label="Detail foto" aria-expanded="false"></button>' +
+      '</div>' +
+      '<div class="detail" hidden>' +
+        '<label class="field">Lokasi<input type="text" class="o-lokasi"></label>' +
+        '<label class="field">Hashtag<input type="text" class="o-hashtag"></label>' +
+        '<div class="row2">' +
+          '<label class="field">Posisi teks<select class="o-pos"></select></label>' +
+          '<label class="field">Ukuran teks (%)<input type="number" class="o-scale" min="30" max="300" step="5" placeholder="Umum"></label>' +
+        '</div>' +
+        '<div class="checks">' +
+          '<label class="check"><input type="checkbox" class="o-hidelogo"><span>Sembunyikan logo</span></label>' +
+          '<label class="check"><input type="checkbox" class="o-hidetext"><span>Sembunyikan teks</span></label>' +
+        '</div>' +
+        '<label class="field">Nama file output<input type="text" class="o-out"></label>' +
+        '<div class="btns">' +
+          '<button class="btn sm rnd">Acak jam</button>' +
+          '<button class="btn sm o-reset">Kembalikan ke umum</button>' +
+          '<button class="btn sm btn-destructive del">Hapus</button>' +
+        '</div>' +
+      '</div>';
+
+    const q = (s) => row.querySelector(s);
+    q('img').src = it.url;
+    q('.name').title = it.name;
+    const d = q('.d');
+    const t = q('.t');
     d.value = it.date;
     t.value = it.time;
+
+    // Pilihan posisi per foto
+    const sel = q('.o-pos');
+    sel.add(new Option('Ikuti umum', ''));
+    POS.forEach((p) => sel.add(new Option(POS_NAME[p], p)));
+
+    const chk = q('.chk');
+    chk.addEventListener('change', () => { it.checked = chk.checked; updateScope(); });
+    chk.addEventListener('click', (e) => e.stopPropagation());
+
     d.addEventListener('input', () => { if (d.value) { it.date = d.value; select(it.id); } });
     t.addEventListener('input', () => { if (t.value) { it.time = t.value; select(it.id); } });
-    row.querySelector('.rnd').addEventListener('click', (e) => {
-      e.stopPropagation();
+
+    // Detail per foto
+    const setO = (k, v) => { it.o[k] = v; select(it.id); };
+    q('.o-lokasi').addEventListener('input', (e) => setO('lokasi', e.target.value));
+    q('.o-hashtag').addEventListener('input', (e) => setO('hashtag', e.target.value));
+    sel.addEventListener('input', () => setO('textPos', sel.value));
+    q('.o-scale').addEventListener('input', (e) => setO('textScale', e.target.value ? Number(e.target.value) : null));
+    q('.o-hidelogo').addEventListener('input', (e) => setO('hideLogo', e.target.checked));
+    q('.o-hidetext').addEventListener('input', (e) => setO('hideText', e.target.checked));
+    q('.o-out').addEventListener('input', (e) => { it.o.outName = e.target.value; });
+    q('.rnd').addEventListener('click', () => {
       it.time = randTime();
       t.value = it.time;
       select(it.id);
     });
-    row.querySelector('.del').addEventListener('click', (e) => {
+    q('.o-reset').addEventListener('click', () => {
+      it.o = { lokasi: '', hashtag: '', hideLogo: false, hideText: false, textPos: '', textScale: null, outName: '' };
+      q('.o-lokasi').value = '';
+      q('.o-hashtag').value = '';
+      sel.value = '';
+      q('.o-scale').value = '';
+      q('.o-hidelogo').checked = false;
+      q('.o-hidetext').checked = false;
+      q('.o-out').value = '';
+      select(it.id);
+    });
+    q('.del').addEventListener('click', () => removeItem(it.id));
+
+    // Buka atau tutup detail
+    q('.chev').addEventListener('click', (e) => {
       e.stopPropagation();
-      removeItem(it.id);
+      const open = q('.detail').hidden;
+      q('.detail').hidden = !open;
+      row.classList.toggle('open', open);
+      q('.chev').setAttribute('aria-expanded', String(open));
+      select(it.id);
     });
     row.addEventListener('click', () => select(it.id));
+
+    // Urutkan ulang dengan drag lewat gagang
+    const grip = q('.grip');
+    grip.addEventListener('mousedown', () => { row.draggable = true; });
+    row.addEventListener('mouseup', () => { if (dragId === null) row.draggable = false; });
+    row.addEventListener('dragstart', (e) => {
+      dragId = it.id;
+      e.dataTransfer.setData('text/x-tstamp-row', String(it.id));
+      e.dataTransfer.effectAllowed = 'move';
+      row.classList.add('dragging');
+    });
+    row.addEventListener('dragend', () => {
+      dragId = null;
+      row.draggable = false;
+      row.classList.remove('dragging');
+      rowEls.forEach((el) => el.classList.remove('drop-before', 'drop-after'));
+    });
+    row.addEventListener('dragover', (e) => {
+      if (dragId === null || dragId === it.id) return;
+      e.preventDefault();
+      const r = row.getBoundingClientRect();
+      const after = e.clientY > r.top + r.height / 2;
+      row.classList.toggle('drop-after', after);
+      row.classList.toggle('drop-before', !after);
+    });
+    row.addEventListener('dragleave', () => row.classList.remove('drop-before', 'drop-after'));
+    row.addEventListener('drop', (e) => {
+      if (dragId === null) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const after = row.classList.contains('drop-after');
+      row.classList.remove('drop-before', 'drop-after');
+      moveItem(dragId, it.id, after);
+    });
+
     rowEls.set(it.id, row);
-    row._d = d; row._t = t;
+    row._d = d;
+    row._t = t;
     return row;
+  }
+
+  function moveItem(id, targetId, after) {
+    const from = items.findIndex((i) => i.id === id);
+    if (from < 0 || id === targetId) return;
+    const [it] = items.splice(from, 1);
+    let to = items.findIndex((i) => i.id === targetId);
+    if (to < 0) { items.splice(from, 0, it); return; }
+    if (after) to += 1;
+    items.splice(to, 0, it);
+    const rows = $('rows');
+    const el = rowEls.get(id);
+    const ref = items[to + 1] ? rowEls.get(items[to + 1].id) : null;
+    rows.insertBefore(el, ref);
+    renumber();
+    setStatus('Urutan diubah.');
   }
 
   function refreshRows() {
@@ -126,7 +315,8 @@
     const row = rowEls.get(id);
     if (row) row.remove();
     rowEls.delete(id);
-    $('count').textContent = `(${items.length})`;
+    renumber();
+    updateScope();
     if (selectedId === id) {
       const next = items[idx] || items[idx - 1] || null;
       select(next ? next.id : null);
@@ -145,13 +335,19 @@
         const it = {
           id: nextId++,
           name: f.name && f.name !== 'image.png' ? f.name : `foto_${++pasteCount}.png`,
-          img, url, date: defDate, time: newTime(),
+          img, url, date: defDate, time: newTime(), checked: false,
+          o: { lokasi: '', hashtag: '', hideLogo: false, hideText: false, textPos: '', textScale: null, outName: '' },
         };
         items.push(it);
         $('rows').appendChild(buildRow(it));
-        $('count').textContent = `(${items.length})`;
         if (firstId === null) firstId = it.id;
-        if (--pending === 0) { select(firstId); setStatus(`${list.length} foto ditambahkan.`); }
+        if (--pending === 0) {
+          renumber();
+          refreshPlaceholders();
+          updateScope();
+          select(firstId);
+          setStatus(`${list.length} foto ditambahkan.`);
+        }
       };
       img.onerror = () => {
         URL.revokeObjectURL(url);
@@ -167,7 +363,11 @@
   $('stage').addEventListener('click', () => { if (!items.length) $('fileInput').click(); });
   $('fileInput').addEventListener('change', (e) => { addFiles(e.target.files); e.target.value = ''; });
 
-  document.addEventListener('dragover', (e) => { e.preventDefault(); $('stage').classList.add('drag'); });
+  const hasFiles = (e) => e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files');
+  document.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    if (hasFiles(e)) $('stage').classList.add('drag');
+  });
   document.addEventListener('dragleave', (e) => { if (!e.relatedTarget) $('stage').classList.remove('drag'); });
   document.addEventListener('drop', (e) => {
     e.preventDefault();
@@ -182,7 +382,7 @@
     if (files.length) { e.preventDefault(); addFiles(files); }
   });
 
-  // ---------- Kontrol pengaturan ----------
+  // ---------- Pengaturan: pengikat kontrol ----------
   function loadLogo() {
     if (!S.logoData) { logoImg = null; return; }
     const im = new Image();
@@ -190,39 +390,80 @@
     im.src = S.logoData;
   }
 
+  function updateLabels() {
+    $('valText').textContent = Math.round(S.textScale * 100) + '%';
+    $('valMargin').textContent = Math.round(S.margin * 100) + '%';
+    $('valOpacity').textContent = S.opacity + '%';
+    $('valShadow').textContent = S.shadow + '%';
+    $('valBoxOpacity').textContent = S.boxOpacity + '%';
+    $('valLogo').textContent = Math.round(S.logoScale * 100) + '%';
+    $('valLogoOpacity').textContent = S.logoOpacity + '%';
+    $('valQuality').textContent = S.quality;
+  }
+
+  const BIND = [
+    ['setLokasi', 'lokasi', 'text'], ['setHashtag', 'hashtag', 'text'], ['setExtra', 'extra', 'text'],
+    ['chkShowDate', 'showDate', 'check'], ['chkShowTime', 'showTime', 'check'],
+    ['chkShowLokasi', 'showLokasi', 'check'], ['chkShowHashtag', 'showHashtag', 'check'],
+    ['chkShowExtra', 'showExtra', 'check'],
+    ['setDateFormat', 'dateFormat', 'select'], ['chkSeconds', 'seconds', 'check'],
+    ['setFont', 'font', 'select'], ['setTextScale', 'textScale', 'pct'], ['setMargin', 'margin', 'pct'],
+    ['setColor', 'color', 'color'], ['setOpacity', 'opacity', 'num'], ['setShadow', 'shadow', 'num'],
+    ['chkBox', 'box', 'check'], ['setBoxColor', 'boxColor', 'color'], ['setBoxOpacity', 'boxOpacity', 'num'],
+    ['setLogoScale', 'logoScale', 'pct'], ['setLogoOpacity', 'logoOpacity', 'num'],
+    ['setStart', 'rangeStart', 'time'], ['setEnd', 'rangeEnd', 'time'],
+    ['chkAscending', 'ascending', 'check'], ['setAutoEvery', 'autoEvery', 'int'],
+    ['setQuality', 'quality', 'num'],
+  ];
+
   function bindControls() {
+    BIND.forEach(([id, key, kind]) => {
+      const el = $(id);
+      if (kind === 'check') el.checked = !!S[key];
+      else if (kind === 'pct') el.value = Math.round(S[key] * 100);
+      else el.value = S[key];
+      el.addEventListener('input', () => {
+        let v;
+        if (kind === 'check') v = el.checked;
+        else if (kind === 'pct') v = Number(el.value) / 100;
+        else if (kind === 'num') v = Number(el.value);
+        else if (kind === 'int') { v = Math.max(1, Math.floor(Number(el.value))); if (!v) return; }
+        else { if ((kind === 'time' || kind === 'color') && !el.value) return; v = el.value; }
+        S[key] = v;
+        saveSettings();
+        updateLabels();
+        if (key === 'lokasi' || key === 'hashtag') refreshPlaceholders();
+        redraw();
+      });
+    });
+
+    function radios(name, key, fromS, toS) {
+      document.querySelectorAll(`input[name=${name}]`).forEach((r) => {
+        r.checked = r.value === fromS(S[key]);
+        r.addEventListener('change', () => {
+          if (r.checked) { S[key] = toS(r.value); saveSettings(); redraw(); }
+        });
+      });
+    }
+    const same = (v) => v;
+    radios('mode', 'mode', same, same);
+    radios('format', 'format', same, same);
+    radios('timeSep', 'timeSep', same, same);
+    radios('hour', 'hour12', (b) => (b ? '12' : '24'), (v) => v === '12');
+    radios('bold', 'bold', (b) => (b ? 'b' : 'n'), (v) => v === 'b');
+    radios('textPos', 'textPos', same, same);
+    radios('logoPos', 'logoPos', same, same);
+
     $('setDate').value = defDate;
     $('setManualTime').value = manualTime;
-    $('setStart').value = S.rangeStart;
-    $('setEnd').value = S.rangeEnd;
-    $('setLokasi').value = S.lokasi;
-    $('setHashtag').value = S.hashtag;
-    $('setTextScale').value = Math.round(S.textScale * 100);
-    $('setLogoScale').value = Math.round(S.logoScale * 100);
-    document.querySelectorAll('input[name=format]').forEach((r) => { r.checked = r.value === S.format; });
-    $('setQuality').value = S.quality;
-    document.querySelectorAll('input[name=mode]').forEach((r) => { r.checked = r.value === S.mode; });
-    const labels = () => {
-      $('valText').textContent = Math.round(S.textScale * 100) + '%';
-      $('valLogo').textContent = Math.round(S.logoScale * 100) + '%';
-      $('valQuality').textContent = S.quality;
-    };
-    labels();
-
     $('setDate').addEventListener('input', (e) => { if (e.target.value) defDate = e.target.value; });
     $('setManualTime').addEventListener('input', (e) => { if (e.target.value) manualTime = e.target.value; });
-    $('setStart').addEventListener('input', (e) => { if (e.target.value) { S.rangeStart = e.target.value; saveSettings(); } });
-    $('setEnd').addEventListener('input', (e) => { if (e.target.value) { S.rangeEnd = e.target.value; saveSettings(); } });
-    document.querySelectorAll('input[name=mode]').forEach((r) =>
-      r.addEventListener('change', () => { if (r.checked) { S.mode = r.value; saveSettings(); } }));
 
-    $('setLokasi').addEventListener('input', (e) => { S.lokasi = e.target.value; saveSettings(); redraw(); });
-    $('setHashtag').addEventListener('input', (e) => { S.hashtag = e.target.value; saveSettings(); redraw(); });
-    $('setTextScale').addEventListener('input', (e) => { S.textScale = e.target.value / 100; labels(); saveSettings(); redraw(); });
-    $('setLogoScale').addEventListener('input', (e) => { S.logoScale = e.target.value / 100; labels(); saveSettings(); redraw(); });
-    document.querySelectorAll('input[name=format]').forEach((r) =>
-      r.addEventListener('change', () => { if (r.checked) { S.format = r.value; saveSettings(); } }));
-    $('setQuality').addEventListener('input', (e) => { S.quality = Number(e.target.value); labels(); saveSettings(); });
+    document.querySelectorAll('input[type=range]').forEach((r) => {
+      const sync = () => r.style.setProperty('--pct', ((r.value - r.min) / (r.max - r.min)) * 100 + '%');
+      sync();
+      r.addEventListener('input', sync);
+    });
 
     $('logoFile').addEventListener('change', (e) => {
       const f = e.target.files[0];
@@ -234,15 +475,63 @@
     });
     $('btnClearLogo').addEventListener('click', () => { S.logoData = null; logoImg = null; saveSettings(); redraw(); });
 
-    document.querySelectorAll('input[type=range]').forEach((r) => {
-      const sync = () => r.style.setProperty('--pct', ((r.value - r.min) / (r.max - r.min)) * 100 + '%');
-      sync();
-      r.addEventListener('input', sync);
+    // Aksi massal: berlaku untuk foto yang dicentang, atau semua bila tidak ada yang dicentang
+    $('btnApplyDate').addEventListener('click', () => {
+      scope().forEach((i) => { i.date = defDate; });
+      refreshRows();
+    });
+    $('btnAutoDate').addEventListener('click', () => {
+      const sc = scope();
+      const arr = T.autoDates(sc.length, defDate, S.autoEvery);
+      sc.forEach((it, i) => { it.date = arr[i]; });
+      refreshRows();
+    });
+    $('btnApplyManual').addEventListener('click', () => {
+      scope().forEach((i) => { i.time = manualTime; });
+      refreshRows();
+    });
+    $('btnRandomAll').addEventListener('click', () => {
+      const sc = scope();
+      if (S.ascending) {
+        // Berurutan naik sesuai urutan daftar, dihitung per tanggal
+        const groups = new Map();
+        sc.forEach((it) => {
+          if (!groups.has(it.date)) groups.set(it.date, []);
+          groups.get(it.date).push(it);
+        });
+        groups.forEach((g) => {
+          const times = T.sortedRandomTimes(g.length, S.rangeStart, S.rangeEnd);
+          g.forEach((it, i) => { it.time = times[i]; });
+        });
+      } else {
+        sc.forEach((it) => { it.time = randTime(); });
+      }
+      refreshRows();
     });
 
-    $('btnApplyDate').addEventListener('click', () => { items.forEach((i) => { i.date = defDate; }); refreshRows(); });
-    $('btnApplyManual').addEventListener('click', () => { items.forEach((i) => { i.time = manualTime; }); refreshRows(); });
-    $('btnRandomAll').addEventListener('click', () => { items.forEach((i) => { i.time = randTime(); }); refreshRows(); });
+    // Daftar foto: pilih semua dan hapus dicentang
+    $('chkAll').addEventListener('change', () => {
+      const on = $('chkAll').checked;
+      items.forEach((it) => {
+        it.checked = on;
+        rowEls.get(it.id).querySelector('.chk').checked = on;
+      });
+      updateScope();
+    });
+    $('btnDeleteChecked').addEventListener('click', () => {
+      items.filter((i) => i.checked).map((i) => i.id).forEach(removeItem);
+    });
+  }
+
+  // Pemilih posisi 9 titik
+  function buildPos(id, name) {
+    const c = $(id);
+    POS.forEach((p) => {
+      const l = document.createElement('label');
+      l.title = POS_NAME[p];
+      l.innerHTML = `<input type="radio" name="${name}" value="${p}"><span></span>`;
+      c.appendChild(l);
+    });
   }
 
   // ---------- Simpan dan salin ----------
@@ -313,7 +602,11 @@
   });
 
   // ---------- Mulai ----------
+  buildPos('posText', 'textPos');
+  buildPos('posLogo', 'logoPos');
   bindControls();
+  updateLabels();
+  updateScope();
   loadLogo();
   if (document.fonts && document.fonts.load) document.fonts.load('400 20px TSFont').then(redraw).catch(() => {});
   window.__tstamp = { items, S };

@@ -6,7 +6,10 @@ Aplikasi desktop (Electron) untuk menambahkan timestamp, lokasi, hashtag, dan lo
 
 - Input foto lewat drag and drop, Ctrl+V, atau tombol Tambah foto. Bisa banyak foto sekaligus.
 - Tanggal dan jam bisa diatur per foto, atau diterapkan ke semua foto.
-- Jam acak dalam rentang yang ditentukan (default 09.00 sampai 17.00).
+- Jam acak dalam rentang yang ditentukan (default 09.00 sampai 17.00), bisa berurutan naik per tanggal.
+- Tanggal otomatis (ganti hari tiap N foto), pilih banyak foto, dan urutkan ulang dengan drag.
+- Pengaturan tampilan: posisi 9 titik, font, ukuran, warna, transparansi, bayangan, kotak latar, format tanggal dan jam.
+- Pengaturan per foto: lokasi, hashtag, posisi, ukuran, sembunyikan logo atau teks, nama file output.
 - Lokasi, hashtag, dan logo bisa diubah. Pengaturan diingat.
 - Simpan satu foto, simpan semua ke satu folder, atau salin ke clipboard (tombol atau Ctrl+C).
 
