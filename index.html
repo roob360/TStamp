@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <meta name="color-scheme" content="light dark">
+  <title>TStamp</title>
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="window">
+
+  <header id="toolbar">
+    <div class="brand">
+      <img class="logo" src="icon.svg" alt="" width="28" height="28">
+      <div class="brand-text">
+        <span class="title">TStamp</span>
+        <span class="subtitle">Timestamp foto untuk logbook</span>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="btnAdd">Tambah foto</button>
+      <button class="btn" id="btnCopy">Salin ke clipboard</button>
+      <button class="btn" id="btnSave">Simpan foto ini</button>
+      <button class="btn btn-default" id="btnSaveAll">Simpan semua</button>
+    </div>
+    <span id="status" role="status"></span>
+  </header>
+
+  <div id="body">
+
+    <aside id="panel">
+      <section class="group">
+        <h2>Tanggal dan jam</h2>
+        <label class="field">Tanggal default
+          <input type="date" id="setDate">
+        </label>
+        <button class="btn" id="btnApplyDate">Terapkan tanggal ke semua</button>
+
+        <div class="seg" role="radiogroup" aria-label="Mode jam">
+          <label><input type="radio" name="mode" value="random"><span>Jam acak</span></label>
+          <label><input type="radio" name="mode" value="manual"><span>Jam manual</span></label>
+        </div>
+        <div class="row2">
+          <label class="field">Acak dari
+            <input type="time" step="1" id="setStart">
+          </label>
+          <label class="field">Sampai
+            <input type="time" step="1" id="setEnd">
+          </label>
+        </div>
+        <button class="btn" id="btnRandomAll">Acak jam semua foto</button>
+        <label class="field">Jam manual
+          <input type="time" step="1" id="setManualTime">
+        </label>
+        <button class="btn" id="btnApplyManual">Terapkan jam ke semua</button>
+      </section>
+
+      <section class="group">
+        <h2>Keterangan</h2>
+        <label class="field">Lokasi
+          <input type="text" id="setLokasi">
+        </label>
+        <label class="field">Hashtag
+          <input type="text" id="setHashtag">
+        </label>
+        <label class="field slider">
+          <span class="slider-head">Ukuran teks <span id="valText"></span></span>
+          <input type="range" id="setTextScale" min="50" max="200" step="5">
+        </label>
+      </section>
+
+      <section class="group">
+        <h2>Logo (kanan atas)</h2>
+        <input type="file" id="logoFile" accept="image/*" class="file">
+        <button class="btn btn-destructive" id="btnClearLogo">Hapus logo</button>
+        <label class="field slider">
+          <span class="slider-head">Ukuran logo <span id="valLogo"></span></span>
+          <input type="range" id="setLogoScale" min="50" max="200" step="5">
+        </label>
+      </section>
+
+      <section class="group">
+        <h2>Output</h2>
+        <div class="seg" role="radiogroup" aria-label="Format">
+          <label><input type="radio" name="format" value="jpg"><span>JPG</span></label>
+          <label><input type="radio" name="format" value="png"><span>PNG</span></label>
+        </div>
+        <label class="field slider">
+          <span class="slider-head">Kualitas JPG <span id="valQuality"></span></span>
+          <input type="range" id="setQuality" min="60" max="100" step="1">
+        </label>
+      </section>
+    </aside>
+
+    <main id="center">
+      <div id="stage">
+        <canvas id="preview" hidden></canvas>
+        <div id="empty">Drag dan drop foto ke sini, tekan Ctrl+V untuk paste, atau klik Tambah foto</div>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" multiple hidden>
+    </main>
+
+    <aside id="list">
+      <h2>Daftar foto <span id="count">(0)</span></h2>
+      <div id="rows"></div>
+    </aside>
+
+  </div>
+</div>
+<script src="core.js"></script>
+<script src="renderer.js"></script>
+</body>
+</html>

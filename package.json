@@ -1,0 +1,22 @@
+{
+  "name": "tstamp",
+  "version": "1.0.0",
+  "description": "Pembuat timestamp foto untuk logbook",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "id.robi.tstamp",
+    "productName": "TStamp",
+    "files": ["main.js", "preload.js", "index.html", "style.css", "core.js", "renderer.js", "icon.svg", "icon.png", "fonts/**/*"],
+    "win": { "target": "portable", "icon": "icon.ico", "signAndEditExecutable": false },
+    "portable": { "artifactName": "TStamp.exe" },
+    "directories": { "output": "dist" }
+  }
+}
