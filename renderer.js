@@ -300,6 +300,18 @@
     }
   });
 
+  // Ctrl+C: salin foto terpilih (hasil stempel) ke clipboard.
+  // Salin teks biasa tetap jalan bila ada teks yang diblok di isian atau halaman.
+  document.addEventListener('keydown', (e) => {
+    if (!(e.ctrlKey || e.metaKey) || e.shiftKey || e.altKey || e.key.toLowerCase() !== 'c') return;
+    const a = document.activeElement;
+    if (a && a.tagName === 'INPUT' && a.type === 'text' && a.selectionStart !== a.selectionEnd) return;
+    const sel = window.getSelection();
+    if (sel && sel.toString()) return;
+    e.preventDefault();
+    $('btnCopy').click();
+  });
+
   // ---------- Mulai ----------
   bindControls();
   loadLogo();

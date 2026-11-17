@@ -8,7 +8,7 @@ Aplikasi desktop (Electron) untuk menambahkan timestamp, lokasi, hashtag, dan lo
 - Tanggal dan jam bisa diatur per foto, atau diterapkan ke semua foto.
 - Jam acak dalam rentang yang ditentukan (default 09.00 sampai 17.00).
 - Lokasi, hashtag, dan logo bisa diubah. Pengaturan diingat.
-- Simpan satu foto, simpan semua ke satu folder, atau salin ke clipboard.
+- Simpan satu foto, simpan semua ke satu folder, atau salin ke clipboard (tombol atau Ctrl+C).
 
 ## Menjalankan
 
