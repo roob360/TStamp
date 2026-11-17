@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 let win;
+app.setAppUserModelId('id.robi.tstamp');
 
 function createWindow() {
   win = new BrowserWindow({

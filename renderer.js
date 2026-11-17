@@ -386,7 +386,13 @@
   });
 
   // ---------- Pengaturan: pengikat kontrol ----------
+  function showLogoPreview() {
+    const t = $('logoThumb');
+    if (S.logoData) { t.src = S.logoData; t.hidden = false; $('logoEmpty').hidden = true; }
+    else { t.removeAttribute('src'); t.hidden = true; $('logoEmpty').hidden = false; }
+  }
   function loadLogo() {
+    showLogoPreview();
     if (!S.logoData) { logoImg = null; return; }
     const im = new Image();
     im.onload = () => { logoImg = im; redraw(); };
@@ -476,7 +482,7 @@
       fr.readAsDataURL(f);
       e.target.value = '';
     });
-    $('btnClearLogo').addEventListener('click', () => { S.logoData = null; logoImg = null; saveSettings(); redraw(); });
+    $('btnClearLogo').addEventListener('click', () => { S.logoData = null; logoImg = null; showLogoPreview(); saveSettings(); redraw(); });
 
     // Aksi massal: berlaku untuk foto yang dicentang, atau semua bila tidak ada yang dicentang
     $('btnApplyDate').addEventListener('click', () => {
