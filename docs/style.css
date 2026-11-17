@@ -72,24 +72,27 @@ img { display: block; max-width: 100%; }
 
 .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
 
-/* ---------- Toolbar ---------- */
+/* ---------- Floating nav bar ---------- */
 .bar {
-  position: sticky; top: 0; z-index: 10; height: var(--toolbar-height);
+  position: sticky; top: 12px; z-index: 10; height: var(--toolbar-height);
+  max-width: 720px; margin: 12px auto 0; padding: 0 8px 0 14px;
+  display: flex; align-items: center; gap: 8px;
   background: var(--material-thick);
   -webkit-backdrop-filter: blur(30px) saturate(1.8); backdrop-filter: blur(30px) saturate(1.8);
-  border-bottom: 1px solid var(--titlebar-border);
+  border: 1px solid var(--titlebar-border); border-radius: var(--radius-capsule);
+  box-shadow: 0 8px 30px #0000001f;
 }
-.bar .wrap { height: 100%; display: flex; align-items: center; gap: 8px; }
 .brand { display: flex; align-items: center; gap: 10px; color: var(--label-primary); font: 700 13px/16px var(--font-sans); margin-right: auto; }
 .brand:hover { text-decoration: none; }
 .brand img { width: 28px; height: 28px; border-radius: 7px; }
 .bar nav { display: flex; gap: 4px; }
 .bar nav a {
   height: var(--control-height-rg); padding: 0 12px; display: flex; align-items: center;
-  border-radius: var(--radius-6); color: var(--button-label); font: 500 13px/16px var(--font-sans);
+  border-radius: var(--radius-capsule); color: var(--button-label); font: 500 13px/16px var(--font-sans);
   transition: background var(--duration-fast) var(--ease-standard);
 }
 .bar nav a:hover { background: var(--control-bordered-fill); text-decoration: none; }
+.bar .btn { border-radius: var(--radius-capsule); }
 
 /* ---------- Tombol ---------- */
 .btn {
@@ -106,7 +109,7 @@ img { display: block; max-width: 100%; }
 .btn-xl { height: var(--control-height-xl); padding: 0 22px; border-radius: var(--radius-capsule); font-size: 15px; line-height: 20px; }
 
 /* ---------- Hero ---------- */
-.hero { padding: 72px 0 56px; display: grid; grid-template-columns: 1fr 1.1fr; gap: 48px; align-items: center; }
+.hero { padding: 56px 0 56px; display: grid; grid-template-columns: 1fr 1.1fr; gap: 48px; align-items: center; }
 .eyebrow { font: 600 11px/14px var(--font-sans); color: var(--label-secondary); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 12px; }
 h1 { font: 700 26px/32px var(--font-sans); margin: 0 0 16px; }
 .lead { font: 400 15px/20px var(--font-sans); color: var(--label-secondary); margin: 0 0 28px; }
@@ -167,6 +170,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
   .bar nav { display: none; }
   .grid { grid-template-columns: 1fr; }
   .wrap { padding: 0 16px; }
+  .bar { margin-left: 16px; margin-right: 16px; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
