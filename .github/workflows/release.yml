@@ -24,7 +24,7 @@ jobs:
         run: npm ci
 
       - name: Bangun TStamp.exe (portable)
-        run: npx electron-builder --win portable --publish never -c.win.signAndEditExecutable=true
+        run: npx electron-builder --win portable --publish never --config.win.signAndEditExecutable=true
 
       - name: Unggah hasil build
         uses: actions/upload-artifact@v4
