@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>TStamp: timestamp foto untuk logbook</title>
+  <meta name="description" content="TStamp menambahkan tanggal, jam, lokasi, hashtag, dan logo pada foto untuk laporan logbook. Aplikasi Windows portable, gratis.">
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="icon.svg" alt="" width="28" height="28">TStamp</a>
+    <nav>
+      <a href="#fitur">Fitur</a>
+      <a href="#cara-pakai">Cara pakai</a>
+      <a href="#tampilan">Tampilan</a>
+    </nav>
+    <a class="btn btn-default" href="https://github.com/roob360/TStamp/releases/latest/download/TStamp.exe">Unduh</a>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Untuk Windows 10 dan 11</p>
+        <h1>Timestamp foto untuk logbook, dalam hitungan detik.</h1>
+        <p class="lead">TStamp menambahkan tanggal, jam, lokasi, hashtag, dan logo pada foto. Masukkan banyak foto sekaligus, atur tanggal dan jam, lalu simpan atau salin.</p>
+        <div class="cta">
+          <a class="btn btn-default btn-xl" href="https://github.com/roob360/TStamp/releases/latest/download/TStamp.exe">Unduh TStamp.exe</a>
+          <a class="btn btn-xl" href="https://github.com/roob360/TStamp">Lihat di GitHub</a>
+        </div>
+        <p class="meta">Portable, tanpa instalasi. Windows 10 atau 11 64-bit.</p>
+      </div>
+      <div class="window" aria-label="Contoh hasil foto dengan timestamp">
+        <div class="titlebar"><span class="dot c"></span><span class="dot m"></span><span class="dot e"></span><span class="wtitle">foto_pagi_ts.jpg</span></div>
+        <img src="img/hasil.jpg" alt="Foto lokasi proyek dengan logo di kanan atas dan tulisan tanggal, jam, lokasi, dan hashtag di bagian bawah" width="1000" height="750">
+      </div>
+    </section>
+  </div>
+
+  <div class="wrap">
+    <section class="block" id="fitur">
+      <h2>Fitur</h2>
+      <p class="sub">Dibuat untuk laporan logbook yang berisi banyak foto, tanpa mengulang pekerjaan yang sama satu per satu.</p>
+      <div class="grid">
+        <div class="card"><h3>Banyak foto sekaligus</h3><p>Drag and drop, Ctrl+V, atau pilih file. Tiap foto punya tanggal dan jam sendiri.</p></div>
+        <div class="card"><h3>Jam acak dalam rentang</h3><p>Tentukan rentang, misalnya 09.00 sampai 17.00. Bisa berurutan naik per tanggal.</p></div>
+        <div class="card"><h3>Tanggal otomatis</h3><p>Ganti hari tiap sekian foto, atau terapkan satu tanggal ke semua foto.</p></div>
+        <div class="card"><h3>Tampilan bisa diatur</h3><p>Posisi 9 titik, font, ukuran, warna, bayangan, kotak latar, dan format tanggal.</p></div>
+        <div class="card"><h3>Pengaturan per foto</h3><p>Lokasi, hashtag, posisi, ukuran, dan nama file bisa berbeda untuk tiap foto.</p></div>
+        <div class="card"><h3>Simpan dan salin</h3><p>Simpan satu foto atau semua sekaligus ke satu folder. Ctrl+C menyalin foto ke clipboard.</p></div>
+      </div>
+    </section>
+
+    <section class="block" id="cara-pakai">
+      <h2>Cara pakai</h2>
+      <p class="sub">Empat langkah dari foto polos sampai foto bertimestamp.</p>
+      <ol class="steps">
+        <li><span class="num">1</span><div><h3>Unduh dan jalankan</h3><p>Unduh <strong>TStamp.exe</strong> dari halaman rilis, lalu klik dua kali. Tidak perlu instalasi.</p></div></li>
+        <li><span class="num">2</span><div><h3>Masukkan foto</h3><p>Drag and drop foto ke jendela, tekan <kbd>Ctrl</kbd> + <kbd>V</kbd>, atau klik Tambah foto. Unggah logo sekali di panel Logo.</p></div></li>
+        <li><span class="num">3</span><div><h3>Atur tanggal dan jam</h3><p>Pilih tanggal, tentukan rentang jam acak atau jam manual, lalu klik Tanggal otomatis dan Acak jam.</p></div></li>
+        <li><span class="num">4</span><div><h3>Simpan atau salin</h3><p>Klik Simpan semua lalu pilih folder, atau tekan <kbd>Ctrl</kbd> + <kbd>C</kbd> untuk menyalin foto yang dipilih.</p></div></li>
+      </ol>
+    </section>
+
+    <section class="block" id="tampilan">
+      <h2>Tampilan</h2>
+      <p class="sub">Antarmuka mengikuti pengaturan terang atau gelap di Windows.</p>
+      <div class="window shot">
+        <div class="titlebar"><span class="dot c"></span><span class="dot m"></span><span class="dot e"></span><span class="wtitle">TStamp</span></div>
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="img/app-dark.png">
+          <img src="img/app-light.png" alt="Jendela TStamp dengan pengaturan di kiri, pratinjau foto di tengah, dan daftar foto di kanan" width="1320" height="840" loading="lazy">
+        </picture>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="note">
+        <h3>Peringatan Windows SmartScreen</h3>
+        <p>TStamp.exe belum ditandatangani digital, jadi Windows bisa menampilkan "Windows protected your PC". Klik <strong>More info</strong>, lalu <strong>Run anyway</strong>.</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>TStamp 1.0.0</span>
+    <span><a href="https://github.com/roob360/TStamp">Kode sumber</a> &middot; <a href="https://github.com/roob360/TStamp/releases">Semua rilis</a></span>
+    <span>Antarmuka mengikuti design system macOS 27</span>
+  </div>
+</footer>
+
+</body>
+</html>

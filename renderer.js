@@ -323,39 +323,42 @@
     }
   }
 
-  function addFiles(files) {
-    const list = Array.from(files).filter((f) => f.type.startsWith('image/'));
-    if (!list.length) { setStatus('Tidak ada file gambar.'); return; }
-    let firstId = null;
-    let pending = list.length;
-    list.forEach((f) => {
+  // Muat semua gambar dulu, lalu tambahkan sesuai urutan pemilihan (bukan urutan selesai dimuat)
+  function loadImage(f) {
+    return new Promise((resolve) => {
       const url = URL.createObjectURL(f);
       const img = new Image();
-      img.onload = () => {
-        const it = {
-          id: nextId++,
-          name: f.name && f.name !== 'image.png' ? f.name : `foto_${++pasteCount}.png`,
-          img, url, date: defDate, time: newTime(), checked: false,
-          o: { lokasi: '', hashtag: '', hideLogo: false, hideText: false, textPos: '', textScale: null, outName: '' },
-        };
-        items.push(it);
-        $('rows').appendChild(buildRow(it));
-        if (firstId === null) firstId = it.id;
-        if (--pending === 0) {
-          renumber();
-          refreshPlaceholders();
-          updateScope();
-          select(firstId);
-          setStatus(`${list.length} foto ditambahkan.`);
-        }
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        setStatus(`Gagal membaca: ${f.name}`);
-        pending--;
-      };
+      img.onload = () => resolve({ f, url, img });
+      img.onerror = () => { URL.revokeObjectURL(url); resolve({ f, error: true }); };
       img.src = url;
     });
+  }
+
+  async function addFiles(files) {
+    const list = Array.from(files).filter((f) => f.type.startsWith('image/'));
+    if (!list.length) { setStatus('Tidak ada file gambar.'); return; }
+    const loaded = await Promise.all(list.map(loadImage));
+    let firstId = null;
+    let added = 0;
+    loaded.forEach(({ f, url, img, error }) => {
+      if (error) { setStatus(`Gagal membaca: ${f.name}`); return; }
+      const it = {
+        id: nextId++,
+        name: f.name && f.name !== 'image.png' ? f.name : `foto_${++pasteCount}.png`,
+        img, url, date: defDate, time: newTime(), checked: false,
+        o: { lokasi: '', hashtag: '', hideLogo: false, hideText: false, textPos: '', textScale: null, outName: '' },
+      };
+      items.push(it);
+      $('rows').appendChild(buildRow(it));
+      if (firstId === null) firstId = it.id;
+      added++;
+    });
+    if (!added) return;
+    renumber();
+    refreshPlaceholders();
+    updateScope();
+    select(firstId);
+    setStatus(`${added} foto ditambahkan.`);
   }
 
   // ---------- Input foto: pilih, drag, paste ----------

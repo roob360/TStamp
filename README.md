@@ -2,6 +2,10 @@
 
 Aplikasi desktop (Electron) untuk menambahkan timestamp, lokasi, hashtag, dan logo pada foto, untuk kebutuhan laporan logbook.
 
+## Unduh
+
+Unduh `TStamp.exe` (portable, tanpa instalasi) dari [halaman Rilis](https://github.com/roob360/TStamp/releases/latest). Panduan lengkap ada di [roob360.github.io/TStamp](https://roob360.github.io/TStamp/).
+
 ## Fitur
 
 - Input foto lewat drag and drop, Ctrl+V, atau tombol Tambah foto. Bisa banyak foto sekaligus.

@@ -1,0 +1,174 @@
+/* Design system "macOS 27". Nilai diambil dari tokens.json, tidak ditebak. */
+
+:root {
+  color-scheme: light dark;
+
+  --label-primary: #000000d9;
+  --label-secondary: #00000080;
+  --label-tertiary: #00000040;
+  --label-vibrant-primary: #363636;
+  --accent-blue: #0088ff;
+  --window-background: #ffffff;
+  --material-thick: #ecececc2;
+  --control-bordered-fill: #00000014;
+  --control-bordered-fill-clicked: #00000029;
+  --control-prominent-fill: var(--accent-blue);
+  --control-prominent-fill-clicked: #0078f0;
+  --on-prominent: #ffffff;
+  --control-tinted-fill: #0088ff29;
+  --titlebar-border: #3c3c431f;
+  --group-box-fill: #00000008;
+  --form-row-separator: #0000000d;
+  --button-label: var(--label-vibrant-primary);
+  --window-control-close: #fa9891;
+  --window-control-minimize: #ffda66;
+  --window-control-expand: #ade392;
+  --shadow-window-active: 0px 0px 1px 0px #000000cc, 0px 36px 100px 0px #00000066;
+
+  --font-sans: "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  --control-height-rg: 24px;
+  --control-height-xl: 36px;
+  --titlebar-height: 33px;
+  --toolbar-height: 44px;
+  --radius-6: 6px;
+  --radius-12: 12px;
+  --radius-16: 16px;
+  --radius-capsule: 999px;
+  --duration-fast: 150ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --label-primary: #ffffff;
+    --label-secondary: #ffffff8c;
+    --label-tertiary: #ffffff40;
+    --label-vibrant-primary: #fffffff5;
+    --accent-blue: #0091ff;
+    --window-background: #1e1e1e;
+    --material-thick: #2c2c2cb5;
+    --control-bordered-fill: #ffffff12;
+    --control-bordered-fill-clicked: #ffffff29;
+    --control-prominent-fill-clicked: #0a99ff;
+    --control-tinted-fill: #0091ff3d;
+    --group-box-fill: #ffffff08;
+    --form-row-separator: #0000000d;
+    --button-label: var(--label-primary);
+  }
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 60px; }
+body {
+  margin: 0; font: 400 13px/16px var(--font-sans);
+  color: var(--label-primary); background: var(--window-background);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent-blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { display: block; max-width: 100%; }
+:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; border-radius: var(--radius-6); }
+
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+
+/* ---------- Toolbar ---------- */
+.bar {
+  position: sticky; top: 0; z-index: 10; height: var(--toolbar-height);
+  background: var(--material-thick);
+  -webkit-backdrop-filter: blur(30px) saturate(1.8); backdrop-filter: blur(30px) saturate(1.8);
+  border-bottom: 1px solid var(--titlebar-border);
+}
+.bar .wrap { height: 100%; display: flex; align-items: center; gap: 8px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--label-primary); font: 700 13px/16px var(--font-sans); margin-right: auto; }
+.brand:hover { text-decoration: none; }
+.brand img { width: 28px; height: 28px; border-radius: 7px; }
+.bar nav { display: flex; gap: 4px; }
+.bar nav a {
+  height: var(--control-height-rg); padding: 0 12px; display: flex; align-items: center;
+  border-radius: var(--radius-6); color: var(--button-label); font: 500 13px/16px var(--font-sans);
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+.bar nav a:hover { background: var(--control-bordered-fill); text-decoration: none; }
+
+/* ---------- Tombol ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: var(--control-height-rg); padding: 0 16px; border-radius: var(--radius-6);
+  background: var(--control-bordered-fill); color: var(--button-label);
+  font: 500 13px/16px var(--font-sans); white-space: nowrap;
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+.btn:hover { text-decoration: none; }
+.btn:active { background: var(--control-bordered-fill-clicked); }
+.btn-default { background: var(--control-prominent-fill); color: var(--on-prominent); }
+.btn-default:active { background: var(--control-prominent-fill-clicked); }
+.btn-xl { height: var(--control-height-xl); padding: 0 22px; border-radius: var(--radius-capsule); font-size: 15px; line-height: 20px; }
+
+/* ---------- Hero ---------- */
+.hero { padding: 72px 0 56px; display: grid; grid-template-columns: 1fr 1.1fr; gap: 48px; align-items: center; }
+.eyebrow { font: 600 11px/14px var(--font-sans); color: var(--label-secondary); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 12px; }
+h1 { font: 700 26px/32px var(--font-sans); margin: 0 0 16px; }
+.lead { font: 400 15px/20px var(--font-sans); color: var(--label-secondary); margin: 0 0 28px; }
+.cta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.meta { font: 400 13px/16px var(--font-sans); color: var(--label-secondary); margin: 0; }
+
+/* Window */
+.window {
+  border-radius: var(--radius-16); overflow: hidden; background: var(--window-background);
+  box-shadow: var(--shadow-window-active);
+}
+.window .titlebar {
+  height: var(--titlebar-height); display: flex; align-items: center; gap: 9px; padding: 0 12px;
+  border-bottom: 1px solid var(--titlebar-border); position: relative;
+}
+.window .dot { width: 14px; height: 14px; border-radius: 50%; }
+.window .dot.c { background: var(--window-control-close); }
+.window .dot.m { background: var(--window-control-minimize); }
+.window .dot.e { background: var(--window-control-expand); }
+.window .wtitle { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 700 13px/16px var(--font-sans); pointer-events: none; }
+.window img { width: 100%; height: auto; }
+
+/* ---------- Bagian ---------- */
+section.block { padding: 56px 0; }
+h2 { font: 700 22px/26px var(--font-sans); margin: 0 0 8px; }
+.sub { font: 400 15px/20px var(--font-sans); color: var(--label-secondary); margin: 0 0 28px; max-width: 640px; }
+
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.card { background: var(--group-box-fill); border-radius: var(--radius-12); padding: 20px; }
+.card h3 { font: 600 15px/20px var(--font-sans); margin: 0 0 6px; }
+.card p { margin: 0; font: 400 13px/18px var(--font-sans); color: var(--label-secondary); }
+
+.steps { list-style: none; margin: 0; padding: 4px 20px; background: var(--group-box-fill); border-radius: var(--radius-12); }
+.steps li { display: grid; grid-template-columns: 24px 1fr; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--form-row-separator); }
+.steps li:last-child { border-bottom: 0; }
+.num {
+  width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: var(--control-prominent-fill); color: var(--on-prominent); font: 600 13px/16px var(--font-sans);
+}
+.steps h3 { font: 600 15px/20px var(--font-sans); margin: 0 0 2px; }
+.steps p { margin: 0; font: 400 13px/18px var(--font-sans); color: var(--label-secondary); }
+kbd { font: 500 12px/16px var(--font-sans); padding: 1px 6px; border-radius: 4px; background: var(--control-bordered-fill); color: var(--button-label); }
+
+.shot { margin-top: 8px; }
+
+.note { background: var(--control-tinted-fill); border-radius: var(--radius-12); padding: 20px; }
+.note h3 { font: 600 15px/20px var(--font-sans); margin: 0 0 6px; color: var(--accent-blue); }
+.note p { margin: 0; font: 400 13px/18px var(--font-sans); color: var(--label-primary); }
+
+footer { border-top: 1px solid var(--titlebar-border); margin-top: 32px; padding: 24px 0 40px; color: var(--label-secondary); font: 400 13px/18px var(--font-sans); }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; padding-top: 40px; gap: 32px; }
+  .grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .bar nav { display: none; }
+  .grid { grid-template-columns: 1fr; }
+  .wrap { padding: 0 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; animation: none !important; }
+}
